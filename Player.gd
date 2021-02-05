@@ -1,7 +1,9 @@
 extends KinematicBody2D
 
 const ACCELERATION = 500
-const MAX_SPEED = 80
+const MAX_SPEED = 200
+const FRICTION = 700
+const GRAVITY = 100000
 
 var velocity = Vector2.ZERO
 
@@ -26,17 +28,22 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	var input_vector = Vector2.ZERO
-	input_vector.x = Input.get_action_strength('ui_right') - Input.get_action_strength('ui_left')
-	input_vector.y = Input.get_action_strength('ui_down') - Input.get_action_strength('ui_up')
-	input_vector = input_vector.normalized()
+	#input_vector.x = Input.get_action_strength('ui_right') - Input.get_action_strength('ui_left')
+	#input_vector.y = Input.get_action_strength('ui_down') - Input.get_action_strength('ui_up')
+	#input_vector = input_vector.normalized()
 	#print(input_vector)
-	velocity = velocity.move_toward(input_vector * MAX_SPEED, ACCELERATION * delta)
+	#velocity = velocity.move_toward(input_vector * MAX_SPEED, ACCELERATION * delta)
 	
 	if input_vector != Vector2.ZERO:
 		animTree.set('parameters/Move/blend_position', input_vector)
 		animState.travel('Move')
+		velocity = velocity.move_toward(input_vector * MAX_SPEED, ACCELERATION * delta)
 	else:
+		#velocity = velocity.move_toward(Vector2.ZERO, FRICTION * delta)
 		animState.travel('Idle')
+	
 		
 func _physics_process(delta):
+	velocity.y += GRAVITY * delta
+	print(velocity)
 	velocity = move_and_slide(velocity)
